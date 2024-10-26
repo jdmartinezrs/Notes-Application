@@ -9,9 +9,9 @@ class User{
         return await newUser.save(); // Guardas el usuario en la base de datos
     }
 
-    async logginUserModel(nombre_usuario) { 
-        return await user.findOne({ nombre_usuario });
-    }
+    async logginUserModel(body) { 
+        return await user.aggregate([body]);
+            }
 
     async updateLoginTimestamp(userId) {
         return await user.findByIdAndUpdate(
