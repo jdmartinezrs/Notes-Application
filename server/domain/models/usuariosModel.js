@@ -10,8 +10,11 @@ class User{
     }
 
     async logginUserModel(body) { 
-        return await user.aggregate([body]);
+        return await user.aggregate([...body]);
             }
+
+
+
 
     async updateLoginTimestamp(userId) {
         return await user.findByIdAndUpdate(

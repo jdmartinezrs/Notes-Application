@@ -5,7 +5,7 @@ const { jsonParseErrorHandler } = require('../middlewares/errorHandling');
 // const path = require('path');
 // const cookieParser = require('cookie-parser')
 const userRoutes = require('../../application/routes/usuarioRoutes');
-
+const noteRoutes = require('../../application/routes/noteRoutes')
 const createServer = () => {
     const app = express();
 
@@ -25,7 +25,7 @@ const createServer = () => {
     //     }
     // }));
  app.use('/user', userRoutes);
-
+app.use('/note', noteRoutes)
     return app; 
 };
 

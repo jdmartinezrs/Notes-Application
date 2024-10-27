@@ -15,3 +15,4 @@ router.post("/usuarios/login", userValidator.logginValidator(),(req, res) =>user
 
 
 module.exports = router;
+
