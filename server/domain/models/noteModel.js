@@ -1,4 +1,5 @@
 const Note = require("../../adapters/noteSchema");
+const NoteHistory = require("../../adapters/noteHistorySchema");
 
 class NoteModel {
 
@@ -9,7 +10,7 @@ class NoteModel {
 
 
     async getAllNotesModel() {
-        return await Note.find(); 
+        return await Note.find().sort({ createdAt: -1 }); 
     }
 
 
@@ -19,23 +20,37 @@ class NoteModel {
         return note;
     }
 
+    async findNotesByTitleModel(title) {
+        try {
+            return await Note.find({ title: { $regex: title, $options: 'i' } });
+        } catch (error) {
+            console.error("Error in findNotesByTitleModel:", error); // Log del error
+            throw new Error("Error retrieving notes from database"); // Mensaje de error genérico
+        }
+    }
     async updateNoteModel(noteId, newData) {
         const note = await Note.findById(noteId);
         if (!note) throw new Error(JSON.stringify({ status: 404, message: "Note not found" }));
 
-        note.history.push({
+        
+        const historyEntry = new NoteHistory({
+            noteId: noteId,
             title: note.title,
             content: note.content,
-            updatedAt: note.updatedAt
+            tags: note.tags,
+            updatedAt: note.updatedAt 
         });
+        await historyEntry.save(); 
 
+        
         note.title = newData.title;
         note.content = newData.content;
-       
+        note.tags = newData.tags;
+
         return await note.save();
     }
 
-    
+
     async deleteNoteByIdModel(noteId) {
         const result = await Note.findByIdAndDelete(noteId);
         if (!result) throw new Error(JSON.stringify({ status: 404, message: "Note not found" }));

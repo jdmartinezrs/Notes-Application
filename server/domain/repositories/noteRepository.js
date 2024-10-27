@@ -26,6 +26,14 @@ class NoteRepository {
         }
     }
 
+    async findNotesByTitleRepository(title) {
+        try {
+            return await new NoteModel().findNotesByTitleModel(title);
+        } catch (error) {
+            console.error("Error in findNotesByTitleRepository:", error); // Log del error
+            throw new Error(JSON.stringify({ status: 500, message: error.message }));
+        }
+    }
 
     async updateNoteRepository(noteId, newData) {
         try {

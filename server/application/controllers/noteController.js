@@ -39,6 +39,24 @@ class NoteController {
         }
     }
 
+    async findNotesByTitleController(req, res) {
+        try {
+            const { title } = req.query;
+            console.log("Título recibido:", title); // Log para verificar el título
+            if (!title) {
+                return res.status(400).json({ message: "Title parameter is required" });
+            }
+            const notes = await this.noteService.findNotesByTitleService(title);
+            if (!notes || notes.length === 0) {
+                return res.status(404).json({ message: "No notes found" });
+            }
+            res.json(notes);
+        } catch (error) {
+            console.error("Error en findNotesByTitleController:", error); // Log del error
+            res.status(500).json({ message: error.message || "Internal Server Error" });
+        }
+    }
+
 
     async updateNoteController(req, res) {
         try {

@@ -17,6 +17,10 @@ class NoteService {
         return await this.noteRepository.getNoteByIdRepository(noteId);
     }
 
+    async findNotesByTitleService(title) {
+        return await this.noteRepository.findNotesByTitleRepository(title);
+    }
+
     async updateNoteService(noteId, newData) {
         return await this.noteRepository.updateNoteRepository(noteId, newData);
     }
