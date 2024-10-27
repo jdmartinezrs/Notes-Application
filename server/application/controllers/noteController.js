@@ -19,6 +19,27 @@ class NoteController {
         }
     }
 
+    async getAllNotesController(req, res) {
+        try {
+            const notes = await this.noteService.getAllNotesService();
+            res.json(notes);
+        } catch (error) {
+            const errorObj = JSON.parse(error.message);
+            res.status(errorObj.status).json({ message: errorObj.message });
+        }
+    }
+
+    async getNoteByIdController(req, res) {
+        try {
+            const note = await this.noteService.getNoteByIdService(req.params.id);
+            res.json(note);
+        } catch (error) {
+            const errorObj = JSON.parse(error.message);
+            res.status(errorObj.status).json({ message: errorObj.message });
+        }
+    }
+
+
     async updateNoteController(req, res) {
         try {
             const errors = validationResult(req);
@@ -31,6 +52,17 @@ class NoteController {
             res.status(errorObj.status).json({ message: errorObj.message });
         }
     }
+
+    async deleteNoteController(req, res) {
+        try {
+            await this.noteService.deleteNoteService(req.params.id);
+            res.status(204).send(); 
+        } catch (error) {
+            const errorObj = JSON.parse(error.message);
+            res.status(errorObj.status).json({ message: errorObj.message });
+        }
+    }
+
 }
 
 module.exports = NoteController;
