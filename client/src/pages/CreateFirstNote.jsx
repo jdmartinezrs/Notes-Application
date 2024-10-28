@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import SaveDialog from '../components/SaveDialog'; // Import the SaveDialog component
 
 const cardColors = [
     'var(--card-1)',
@@ -13,6 +14,9 @@ const cardColors = [
 const CreateFirstNote = () => {
     const [notes, setNotes] = useState([]);
     const [hoveredIndex, setHoveredIndex] = useState(null);
+    const [hoverTimeout, setHoverTimeout] = useState(null);
+    const [dialogVisible, setDialogVisible] = useState(false); // State for the SaveDialog visibility
+    const [noteToDelete, setNoteToDelete] = useState(null); // State to store the note to delete
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -28,12 +32,10 @@ const CreateFirstNote = () => {
     }, []);
 
     const addNote = () => {
-        // Generate a new note with a temporary ID
         const newNote = {
             title: `New Note ${notes.length + 1}`,
         };
 
-        // Navigate to CreateNotes with the new note data
         navigate('/CreateNotes', { state: { note: newNote } });
     };
 
@@ -52,8 +54,30 @@ const CreateFirstNote = () => {
     };
 
     const handleNoteClick = (noteId) => {
-        // Navigate to InsideNotes for existing notes
         navigate(`/InsideNotes/${noteId}`);
+    };
+
+    const confirmDeleteNote = async () => {
+        if (noteToDelete) {
+            try {
+                const response = await fetch(`http://localhost:3000/note/notes/${noteToDelete}`, {
+                    method: 'DELETE',
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to delete note');
+                }
+
+                setNotes(prevNotes => prevNotes.filter(note => note._id !== noteToDelete));
+                console.log(`Note with ID ${noteToDelete} deleted successfully.`);
+            } catch (error) {
+                console.error('Error deleting note:', error);
+                alert('Failed to delete the note. Please try again.');
+            } finally {
+                setDialogVisible(false); // Close the dialog after the operation
+                setNoteToDelete(null); // Reset the note to delete
+            }
+        }
     };
 
     return (
@@ -83,10 +107,10 @@ const CreateFirstNote = () => {
 
                         return (
                             <div
-                                key={note._id} // Make sure to use the correct ID here
+                                key={note._id}
                                 className='h-[100px] w-[350px] rounded-[10px] flex justify-center items-center mx-2 cursor-pointer'
                                 style={noteStyle}
-                                onClick={() => handleNoteClick(note._id)} // Use the ID of the existing note
+                                onClick={() => handleNoteClick(note._id)}
                                 onMouseEnter={() => handleMouseEnter(index)}
                                 onMouseLeave={handleMouseLeave}
                             >
@@ -94,7 +118,12 @@ const CreateFirstNote = () => {
                                     <img 
                                         src="/img/delete.png" 
                                         alt="Ícono" 
-                                        className='w-5 h-5' 
+                                        className='w-5 h-5'
+                                        onClick={(e) => {
+                                            e.stopPropagation(); // Prevent click from bubbling up
+                                            setNoteToDelete(note._id); // Set the note ID to delete
+                                            setDialogVisible(true); // Show the SaveDialog
+                                        }} 
                                     />
                                 ) : (
                                     <p className='transition-opacity duration-300 ease-in-out'>{note.title}</p>
@@ -116,6 +145,15 @@ const CreateFirstNote = () => {
                     <img src="/img/add.png" alt="Ícono" className='w-5 h-5' />
                 </div>
             </div>
+
+            {/* Render the SaveDialog component */}
+            {dialogVisible && (
+                <SaveDialog 
+                    message="Are you sure you want to delete this note?"
+                    onConfirm={confirmDeleteNote} // Pass the confirm function
+                    onCancel={() => setDialogVisible(false)} // Function to close the dialog
+                />
+            )}
         </>
     );
 };
