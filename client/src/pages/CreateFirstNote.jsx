@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const cardColors = [
     'var(--card-1)',
@@ -11,7 +12,8 @@ const cardColors = [
 
 const CreateFirstNote = () => {
     const [notes, setNotes] = useState([]);
-    const [hoveredIndex, setHoveredIndex] = useState(null); // Agregar estado para el índice de hover
+    const [hoveredIndex, setHoveredIndex] = useState(null);
+    const navigate = useNavigate();
 
     useEffect(() => {
         fetch('http://localhost:3000/note/notes')
@@ -27,25 +29,28 @@ const CreateFirstNote = () => {
 
     const addNote = () => {
         const newNote = {
+            id: notes.length + 1,
             title: `New Note ${notes.length + 1}`,
         };
-
-        // Actualiza el estado para incluir la nueva nota
         setNotes(prevNotes => [...prevNotes, newNote]);
     };
 
     const handleMouseEnter = (index) => {
         const timeout = setTimeout(() => {
             setHoveredIndex(index);
-        }, 300); // Retraso para activar el hover
+        }, 300);
         setHoverTimeout(timeout);
     };
 
     const handleMouseLeave = () => {
         if (hoverTimeout) {
-            clearTimeout(hoverTimeout); // Limpia el timeout si se sale antes del tiempo
+            clearTimeout(hoverTimeout);
         }
-        setHoveredIndex(null); // Desactiva el hover inmediatamente
+        setHoveredIndex(null);
+    };
+
+    const handleNoteClick = (noteId) => {
+        navigate(`/InsideNotes/${noteId}`);
     };
 
     return (
@@ -75,9 +80,10 @@ const CreateFirstNote = () => {
 
                         return (
                             <div
-                                key={index}
-                                className='h-[100px] w-[350px] rounded-[10px] flex justify-center items-center mx-2'
+                                key={note.id}
+                                className='h-[100px] w-[350px] rounded-[10px] flex justify-center items-center mx-2 cursor-pointer'
                                 style={noteStyle}
+                                onClick={() => handleNoteClick(note._id)}
                                 onMouseEnter={() => handleMouseEnter(index)}
                                 onMouseLeave={handleMouseLeave}
                             >
@@ -102,13 +108,13 @@ const CreateFirstNote = () => {
                 <div 
                     className='bg-input-1 p-3 rounded-[50px] flex items-center justify-center h-[55px] w-[55px]' 
                     style={{ boxShadow: '-2px 2px 5px var(--color-4)' }} 
-                    onClick={addNote} // Añadir el manejador de clics, añadir nota
+                    onClick={addNote}
                 >
                     <img src="/img/add.png" alt="Ícono" className='w-5 h-5' />
                 </div>
             </div>
         </>
     );
-}
+};
 
 export default CreateFirstNote;

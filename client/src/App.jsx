@@ -10,7 +10,7 @@ function App() {
       <Routes>
         
         <Route path='/CreateFirstNote' element={<CreateFirstNote />} />
-        <Route path='/InsideNotes' element={<InsideNotes />} />
+        <Route path='/InsideNotes/:id' element={<InsideNotes />} />
         <Route path='/CreateNotes' element={<CreateNotes />} />
       </Routes>
     </Router>
