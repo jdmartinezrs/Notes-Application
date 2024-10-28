@@ -1,34 +1,49 @@
 /** @type {import('tailwindcss').Config} */
 export default {
-    darkMode: 'class', // Activa el modo oscuro usando clases
     content: [
       "./index.html",
-      "./src/**/*.{vue,js,ts,jsx,tsx}",
-      "./node_modules/flowbite/**/*.js",
+      "./src/**/*.{js,jsx,ts,tsx}",
     ],
     theme: {
       extend: {
+        fontSize: {
+          'medio': '35px',  // Tamaño de fuente personalizado
+          'xxs': '0.625rem',  // Tamaño de fuente adicional
+        },
+        fontFamily: {
+          nunito: ['Nunito', 'sans-serif'],
+        },
         colors: {
-          background1: '#252525',
-          background2: '#9A9A9A',
-          button1: '#3B3B3B',
-          button2: '#FF0000',
-          input1: '#3B3B3B',
-          card1: '#FD99FF',
-          card2: '#FF9E9E',
-          card3: '#91F48F',
-          card4: '#FFF599',
-          card5: '#9EFFFF',
-          card6: '#B69CFF',
-          color1: '#FFFFFF',
-          color2: '#CFCFCF',
-          color3: '#9A9A9A',
-          color4: '#000000',
+          background: 'var(--background-1)',  // Color de fondo global
+          button: {
+            1: 'var(--button-1)',
+            2: 'var(--button-2)',
+          },
+          input: {
+            1: 'var(--input-1)',
+          },
+          card: {
+            1: 'var(--card-1)',
+            2: 'var(--card-2)',
+            3: 'var(--card-3)',
+            4: 'var(--card-4)',
+            5: 'var(--card-5)',
+            6: 'var(--card-6)',
+          },
+          color: {
+            1: 'var(--color-1)',
+            2: 'var(--color-2)',
+            3: 'var(--color-3)',
+            4: 'var(--color-4)',
+          },
+          graySearch: "#3D3D3D",
+          grayUbi: "#D9D9D9",
+        },
+        margin: {
+          'standar': '35px', // Define el margen personalizado de 35px
         },
       },
     },
-    plugins: [
-      require('flowbite/plugin'),
-    ],
+    plugins: [],
   }
   

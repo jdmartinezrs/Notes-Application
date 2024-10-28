@@ -16,7 +16,6 @@
   "license": "ISC",
   "description": "La **Aplicación de Notas** es una plataforma diseñada para facilitar la gestión de notas personales de los usuarios. Su principal objetivo es proporcionar un entorno sencillo y accesible donde los usuarios puedan crear, editar, visualizar y eliminar sus notas de manera eficiente. La aplicación cuenta con funcionalidades como la búsqueda de notas, autenticación de usuario y un historial de cambios, lo que permite a los usuarios organizar sus pensamientos y mantener un registro de sus ideas de forma segura y privada.",
   "devDependencies": {
-    "@vitejs/plugin-vue": "^5.1.4",
     "autoprefixer": "^10.4.20",
     "concurrently": "^9.0.1",
     "postcss": "^8.4.47",
@@ -39,6 +38,9 @@
     "jwt-decode": "^4.0.0",
     "mongoose": "^8.7.3",
     "path": "^0.12.7",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.27.0",
     "vue": "^3.5.12",
     "vue-router": "^4.4.5"
   }
