@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from "react-router-dom";
 
 const cardColors = [
     'var(--card-1)',
@@ -12,7 +11,7 @@ const cardColors = [
 
 const CreateFirstNote = () => {
     const [notes, setNotes] = useState([]);
-    // const navigate = useNavigate(); // Puedes descomentar esto si lo necesitas
+    const [hoveredIndex, setHoveredIndex] = useState(null); // Agregar estado para el índice de hover
 
     useEffect(() => {
         fetch('http://localhost:3000/note/notes')
@@ -26,15 +25,27 @@ const CreateFirstNote = () => {
             .catch(error => console.error('Error fetching notes:', error));
     }, []);
 
-    ///añadir nota
     const addNote = () => {
         const newNote = {
             title: `New Note ${notes.length + 1}`,
-           // Cambia esto por la URL de la imagen
         };
 
         // Actualiza el estado para incluir la nueva nota
         setNotes(prevNotes => [...prevNotes, newNote]);
+    };
+
+    const handleMouseEnter = (index) => {
+        const timeout = setTimeout(() => {
+            setHoveredIndex(index);
+        }, 300); // Retraso para activar el hover
+        setHoverTimeout(timeout);
+    };
+
+    const handleMouseLeave = () => {
+        if (hoverTimeout) {
+            clearTimeout(hoverTimeout); // Limpia el timeout si se sale antes del tiempo
+        }
+        setHoveredIndex(null); // Desactiva el hover inmediatamente
     };
 
     return (
@@ -50,27 +61,44 @@ const CreateFirstNote = () => {
                     </div>
                 </div>
             </div>
-            <div className='flex flex-wrap justify-center gap-y-4'> {/* Cambié aquí para incluir un gap entre las filas */}
-    {notes.length > 0 ? (
-        notes.map((note, index) => {
-            const colorIndex = index % cardColors.length; // Ciclo a través de los colores
-            
-            return (
-                <div
-                    key={index}
-                    className='h-[100px] w-[350px] rounded-[10px] flex justify-center items-center mx-2' // Añadido mx-2 para espacio horizontal
-                    style={{ backgroundColor: cardColors[colorIndex] }} // Asignar el color
-                >
-                    <p>{note.title}</p>
-                </div>
-            );
-        })
-    ) : (
-        <p>No notes available</p> // Mensaje por si no hay notas
-    )}
-</div>
 
-<div className='fixed bottom-20 right-4'> 
+            <div className='flex flex-wrap justify-center gap-y-4'>
+                {notes.length > 0 ? (
+                    notes.map((note, index) => {
+                        const colorIndex = index % cardColors.length;
+                        const isHovered = hoveredIndex === index;
+
+                        const noteStyle = {
+                            backgroundColor: isHovered ? 'var(--button-2)' : cardColors[colorIndex],
+                            transition: 'all 0.3s ease-in-out',
+                        };
+
+                        return (
+                            <div
+                                key={index}
+                                className='h-[100px] w-[350px] rounded-[10px] flex justify-center items-center mx-2'
+                                style={noteStyle}
+                                onMouseEnter={() => handleMouseEnter(index)}
+                                onMouseLeave={handleMouseLeave}
+                            >
+                                {isHovered ? (
+                                    <img 
+                                        src="/img/delete.png" 
+                                        alt="Ícono" 
+                                        className='w-5 h-5' 
+                                    />
+                                ) : (
+                                    <p className='transition-opacity duration-300 ease-in-out'>{note.title}</p>
+                                )}
+                            </div>
+                        );
+                    })
+                ) : (
+                    <p>No notes available</p>
+                )}
+            </div>
+
+            <div className='fixed bottom-20 right-4'> 
                 <div 
                     className='bg-input-1 p-3 rounded-[50px] flex items-center justify-center h-[55px] w-[55px]' 
                     style={{ boxShadow: '-2px 2px 5px var(--color-4)' }} 
