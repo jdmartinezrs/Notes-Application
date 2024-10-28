@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import SaveDialog from '../components/SaveDialog'; // Asegúrate de importar SaveDialog
 
 const InsideNotes = () => {
-    const { id } = useParams(); // Obtain the ID from the URL
+    const { id } = useParams(); // Obtener el ID de la URL
     const navigate = useNavigate();
-    const [note, setNote] = useState(null); // Use a single note instead of an array
+    const [note, setNote] = useState(null); // Usar una única nota en lugar de un array
     const [error, setError] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
+    const [showDialog, setShowDialog] = useState(false); // Estado para mostrar el diálogo
 
     useEffect(() => {
         const fetchNote = async () => {
@@ -31,7 +33,7 @@ const InsideNotes = () => {
 
                 const data = await response.json();
                 console.log('Data received:', data);
-                setNote(data); // Set the single note data
+                setNote(data); // Establecer los datos de la nota
             } catch (error) {
                 console.error('Error details:', error);
                 setError(error.message);
@@ -41,7 +43,7 @@ const InsideNotes = () => {
         };
 
         fetchNote();
-    }, [id]); // Now the effect runs when the ID changes
+    }, [id]);
 
     const autoResize = (e) => {
         e.target.style.height = 'auto';
@@ -49,7 +51,33 @@ const InsideNotes = () => {
     };
 
     const handleGoBack = () => {
-        navigate(-1); // Go back to the previous page
+        navigate(-1); // Regresar a la página anterior
+    };
+
+    const handleSave = async () => {
+        try {
+            const response = await fetch(`http://localhost:3000/note/notes/${id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    title: note.title,
+                    content: note.content,
+                }),
+            });
+    
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status} - ${response.statusText}`);
+            }
+    
+            const data = await response.json();
+            console.log('Note updated:', data);
+            setShowDialog(false);
+        } catch (error) {
+            console.error('Error updating note:', error);
+            setError(`Error updating note: ${error.message}`);
+        }
     };
 
     if (isLoading) {
@@ -61,7 +89,7 @@ const InsideNotes = () => {
     }
 
     if (!note) {
-        return <p className="text-center text-gray-400">No note available</p>; // Handle case if no note is found
+        return <p className="text-center text-gray-400">No note available</p>; // Manejar el caso si no se encuentra la nota
     }
 
     return (
@@ -73,7 +101,10 @@ const InsideNotes = () => {
                 >
                     <img src="/img/chevron_left.png" alt="Back Icon" className='w-3 h-5' />
                 </div>
-                <div className='bg-input-1 p-3 rounded-[20px] flex items-center justify-center h-[55px] w-[55px]'>
+                <div 
+                    className='bg-input-1 p-3 rounded-[20px] flex items-center justify-center h-[55px] w-[55px]' 
+                    onClick={() => setShowDialog(true)} // Muestra el diálogo al hacer clic
+                >
                     <img src="/img/mode.png" alt="Edit Icon" className='w-5 h-5' />
                 </div>
             </div>
@@ -82,7 +113,7 @@ const InsideNotes = () => {
                 <textarea
                     value={note.title || ''}
                     onChange={(e) => {
-                        setNote(prev => ({ ...prev, title: e.target.value })); // Update title in note object
+                        setNote(prev => ({ ...prev, title: e.target.value })); // Actualiza el título en el objeto note
                         autoResize(e);
                     }}
                     onInput={autoResize}
@@ -94,7 +125,7 @@ const InsideNotes = () => {
                 <textarea
                     value={note.content || ''}
                     onChange={(e) => {
-                        setNote(prev => ({ ...prev, content: e.target.value })); // Update content in note object
+                        setNote(prev => ({ ...prev, content: e.target.value })); // Actualiza el contenido en el objeto note
                         autoResize(e);
                     }}
                     onInput={autoResize}
@@ -102,6 +133,13 @@ const InsideNotes = () => {
                     className="w-full bg-transparent text-gray-400 text-xl placeholder-gray-500 focus:outline-none resize-none min-h-[200px]"
                 />
             </div>
+
+            {showDialog && (
+                <SaveDialog 
+                    onConfirm={() => { handleSave(); setShowDialog(false); }} // Llama a handleSave y cierra el diálogo
+                    onCancel={() => setShowDialog(false)} // Cierra el diálogo al cancelar
+                />
+            )}
         </>
     );
 };
