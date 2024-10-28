@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useLocation } from 'react-router-dom';
+import SaveDialog from '../components/SaveDialog'; // Asegúrate de importar el SaveDialog
 
 const CreateNotes = () => {
     const location = useLocation();
@@ -9,20 +10,25 @@ const CreateNotes = () => {
     const [content, setContent] = useState('');
     const [error, setError] = useState('');
     const [isSaving, setIsSaving] = useState(false);
+    const [showSaveDialog, setShowSaveDialog] = useState(false);
 
     const autoResize = (e) => {
         e.target.style.height = 'auto';
         e.target.style.height = e.target.scrollHeight + 'px';
     };
 
-    const handleSaveClick = async () => {
+    const handleSaveClick = () => {
         if (title.trim() === '' || content.trim() === '') {
             setError('Title and content cannot be empty.');
             return;
         }
+        setShowSaveDialog(true); // Muestra el diálogo de confirmación
+    };
 
+    const handleConfirmSave = async () => {
         setError('');
         setIsSaving(true);
+        setShowSaveDialog(false); // Cierra el diálogo
 
         try {
             const response = await fetch('http://localhost:3000/note/create', {
@@ -55,6 +61,10 @@ const CreateNotes = () => {
         } finally {
             setIsSaving(false);
         }
+    };
+
+    const handleCancelSave = () => {
+        setShowSaveDialog(false); // Cierra el diálogo sin guardar
     };
 
     return (
@@ -108,8 +118,12 @@ const CreateNotes = () => {
                     <p className="text-red-500">{error}</p>
                 </div>
             )}
+
+            {showSaveDialog && (
+                <SaveDialog onConfirm={handleConfirmSave} onCancel={handleCancelSave} />
+            )}
         </>
     );
-}
+};
 
 export default CreateNotes;
