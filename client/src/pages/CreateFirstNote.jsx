@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import SaveDialog from '../components/SaveDialog'; // Import the SaveDialog component
+import SaveDialog from '../components/SaveDialog';
+import SearchInput from '../components/SearchInput';
 
 const cardColors = [
     'var(--card-1)',
@@ -13,10 +14,10 @@ const cardColors = [
 
 const CreateFirstNote = () => {
     const [notes, setNotes] = useState([]);
+    const [filteredNotes, setFilteredNotes] = useState([]); // Para mantener las notas filtradas
     const [hoveredIndex, setHoveredIndex] = useState(null);
     const [hoverTimeout, setHoverTimeout] = useState(null);
-    const [dialogVisible, setDialogVisible] = useState(false); // State for the SaveDialog visibility
-    const [noteToDelete, setNoteToDelete] = useState(null); // State to store the note to delete
+    const [searchActive, setSearchActive] = useState(false); // Para saber si el campo de búsqueda está activo
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -27,7 +28,10 @@ const CreateFirstNote = () => {
                 }
                 return response.json();
             })
-            .then(data => setNotes(data))
+            .then(data => {
+                setNotes(data);
+                setFilteredNotes(data); // Inicialmente, todas las notas son filtradas
+            })
             .catch(error => console.error('Error fetching notes:', error));
     }, []);
 
@@ -35,7 +39,6 @@ const CreateFirstNote = () => {
         const newNote = {
             title: `New Note ${notes.length + 1}`,
         };
-
         navigate('/CreateNotes', { state: { note: newNote } });
     };
 
@@ -57,10 +60,10 @@ const CreateFirstNote = () => {
         navigate(`/InsideNotes/${noteId}`);
     };
 
-    const confirmDeleteNote = async () => {
-        if (noteToDelete) {
+    const handleDeleteNote = async (noteId) => {
+        if (window.confirm('Are you sure you want to delete this note?')) {
             try {
-                const response = await fetch(`http://localhost:3000/note/notes/${noteToDelete}`, {
+                const response = await fetch(`http://localhost:3000/note/notes/${noteId}`, {
                     method: 'DELETE',
                 });
 
@@ -68,35 +71,48 @@ const CreateFirstNote = () => {
                     throw new Error('Failed to delete note');
                 }
 
-                setNotes(prevNotes => prevNotes.filter(note => note._id !== noteToDelete));
-                console.log(`Note with ID ${noteToDelete} deleted successfully.`);
+                setNotes(prevNotes => prevNotes.filter(note => note._id !== noteId));
+                setFilteredNotes(prevNotes => prevNotes.filter(note => note._id !== noteId)); // Actualizar las notas filtradas
+                console.log(`Note with ID ${noteId} deleted successfully.`);
             } catch (error) {
                 console.error('Error deleting note:', error);
                 alert('Failed to delete the note. Please try again.');
-            } finally {
-                setDialogVisible(false); // Close the dialog after the operation
-                setNoteToDelete(null); // Reset the note to delete
             }
+        }
+    };
+
+    const handleSearch = (query) => {
+        if (query) {
+            const filtered = notes.filter(note => note.title.toLowerCase().includes(query.toLowerCase()));
+            setFilteredNotes(filtered);
+        } else {
+            setFilteredNotes(notes); // Si no hay consulta, mostrar todas las notas
         }
     };
 
     return (
         <>
             <div className='flex justify-between mt-standar p-5'>
-                <h1 className='text-medio text-color-1'>Notes</h1>
+                <h1 className={`text-medio text-color-1 ${searchActive ? 'hidden' : ''}`}>Notes</h1>
                 <div className='flex gap-4'>
-                    <div className='bg-input-1 p-3 rounded-[20px] flex items-center justify-center h-[55px] w-[55px]'>
-                        <img src="/img/search.png" alt="Ícono" className='w-5 h-5' />
-                    </div>
-                    <div className='bg-input-1 p-3 rounded-[15px] flex items-center justify-center h-[55px] w-[55px]'>
-                        <img src="/public/img/info_outline.png" alt="Ícono" className='w-6 h-6' />
-                    </div>
+                    {searchActive ? (
+                        <SearchInput onSearch={handleSearch} onClose={() => setSearchActive(false)} />
+                    ) : (
+                        <>
+                            <div className='bg-input-1 p-3 rounded-[20px] flex items-center justify-center h-[55px] w-[55px]' onClick={() => setSearchActive(true)}>
+                                <img src="/img/search.png" alt="Ícono" className='w-5 h-5' />
+                            </div>
+                            <div className='bg-input-1 p-3 rounded-[15px] flex items-center justify-center h-[55px] w-[55px]'>
+                                <img src="/public/img/info_outline.png" alt="Ícono" className='w-6 h-6' />
+                            </div>
+                        </>
+                    )}
                 </div>
             </div>
 
             <div className='flex flex-wrap justify-center gap-y-4'>
-                {notes.length > 0 ? (
-                    notes.map((note, index) => {
+                {filteredNotes.length > 0 ? (
+                    filteredNotes.map((note, index) => {
                         const colorIndex = index % cardColors.length;
                         const isHovered = hoveredIndex === index;
 
@@ -120,9 +136,8 @@ const CreateFirstNote = () => {
                                         alt="Ícono" 
                                         className='w-5 h-5'
                                         onClick={(e) => {
-                                            e.stopPropagation(); // Prevent click from bubbling up
-                                            setNoteToDelete(note._id); // Set the note ID to delete
-                                            setDialogVisible(true); // Show the SaveDialog
+                                            e.stopPropagation();
+                                            handleDeleteNote(note._id);
                                         }} 
                                     />
                                 ) : (
@@ -145,15 +160,6 @@ const CreateFirstNote = () => {
                     <img src="/img/add.png" alt="Ícono" className='w-5 h-5' />
                 </div>
             </div>
-
-            {/* Render the SaveDialog component */}
-            {dialogVisible && (
-                <SaveDialog 
-                    message="Are you sure you want to delete this note?"
-                    onConfirm={confirmDeleteNote} // Pass the confirm function
-                    onCancel={() => setDialogVisible(false)} // Function to close the dialog
-                />
-            )}
         </>
     );
 };
