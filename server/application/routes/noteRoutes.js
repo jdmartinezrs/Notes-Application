@@ -1,7 +1,7 @@
 const express = require('express');
 const NoteController = require('../../application/controllers/noteController');
 const NoteValidator = require("../../application/validator/noteValidator");
-
+const {auth} = require("../../application/middleware/authenticateToken")
 const router = express.Router();
 const noteController = new NoteController();
 const noteValidator = new NoteValidator();
