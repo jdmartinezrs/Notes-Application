@@ -6,7 +6,7 @@ const router = express.Router();
 const noteController = new NoteController();
 const noteValidator = new NoteValidator();
 
-router.post("/notes", noteValidator.createNoteValidator(), (req, res) => noteController.createNoteController(req, res));
+router.post("/create", noteValidator.createNoteValidator(), (req, res) => noteController.createNoteController(req, res));
 router.get("/notes", noteValidator.getAllNotesValidator(), (req, res) => noteController.getAllNotesController(req, res)); 
 router.get("/notes/:id", noteValidator.getNoteByIdValidator(), (req, res) => noteController.getNoteByIdController(req, res)); 
 router.get("/notes/search/title", noteValidator.searchNoteByTitleValidator(), (req, res) => noteController.findNotesByTitleController(req, res)); 

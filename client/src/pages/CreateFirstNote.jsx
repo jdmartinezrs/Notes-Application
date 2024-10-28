@@ -28,11 +28,13 @@ const CreateFirstNote = () => {
     }, []);
 
     const addNote = () => {
+        // Generate a new note with a temporary ID
         const newNote = {
-            id: notes.length + 1,
             title: `New Note ${notes.length + 1}`,
         };
-        setNotes(prevNotes => [...prevNotes, newNote]);
+
+        // Navigate to CreateNotes with the new note data
+        navigate('/CreateNotes', { state: { note: newNote } });
     };
 
     const handleMouseEnter = (index) => {
@@ -50,6 +52,7 @@ const CreateFirstNote = () => {
     };
 
     const handleNoteClick = (noteId) => {
+        // Navigate to InsideNotes for existing notes
         navigate(`/InsideNotes/${noteId}`);
     };
 
@@ -80,10 +83,10 @@ const CreateFirstNote = () => {
 
                         return (
                             <div
-                                key={note.id}
+                                key={note._id} // Make sure to use the correct ID here
                                 className='h-[100px] w-[350px] rounded-[10px] flex justify-center items-center mx-2 cursor-pointer'
                                 style={noteStyle}
-                                onClick={() => handleNoteClick(note._id)}
+                                onClick={() => handleNoteClick(note._id)} // Use the ID of the existing note
                                 onMouseEnter={() => handleMouseEnter(index)}
                                 onMouseLeave={handleMouseLeave}
                             >
