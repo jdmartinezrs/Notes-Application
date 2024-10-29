@@ -1,17 +1,17 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom'; // Importa useNavigate
 
 const StartScreen = () => {
   const [isHoveredLogIn, setIsHoveredLogIn] = useState(false);
   const [isHoveredSignIn, setIsHoveredSignIn] = useState(false);
+  const navigate = useNavigate(); // Inicializa useNavigate
 
   const handleLogInClick = () => {
-    // Puedes agregar la lógica para el clic en Log-in aquí
-    console.log("Log-in button clicked");
+    navigate('/LogIn'); // Navega a la ruta LogIn
   };
 
   const handleSignInClick = () => {
-    // Puedes agregar la lógica para el clic en Sign-in aquí
-    console.log("Sign-in button clicked");
+    navigate('/SingIn'); // Navega a la ruta SingIn
   };
 
   return (
@@ -27,7 +27,7 @@ const StartScreen = () => {
             className={`bg-card-3 text-black p-3 rounded-[20px] flex items-center justify-center h-[55px] w-[270px] ${isHoveredLogIn ? 'bg-card-6' : ''}`}
             onMouseEnter={() => setIsHoveredLogIn(true)}
             onMouseLeave={() => setIsHoveredLogIn(false)}
-            onClick={handleLogInClick} // Llama a la función al hacer clic
+            onClick={handleLogInClick} 
           >
             Log-in
           </button>
@@ -37,7 +37,7 @@ const StartScreen = () => {
             className={`bg-card-5 text-black p-3 rounded-[20px] flex items-center justify-center h-[55px] w-[270px] ${isHoveredSignIn ? 'bg-card-4' : ''}`}
             onMouseEnter={() => setIsHoveredSignIn(true)}
             onMouseLeave={() => setIsHoveredSignIn(false)}
-            onClick={handleSignInClick} // Llama a la función al hacer clic
+            onClick={handleSignInClick} 
           >
             Sign-in
           </button>
